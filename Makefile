@@ -4,12 +4,6 @@ SUBLEVEL = 1
 EXTRAVERSION =
 NAME = bionic
 
-# prevent local tree builds in bionic,
-# but allow initial version check (SUBMAKE)
-ifeq (,$(filter s, $(MAKEFLAGS)))
-    KBUILD_OUTPUT ?= $(OUT)/obj/busybox
-endif
-
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
 # More info can be located in ./README
@@ -471,6 +465,7 @@ core-y		:= \
 		applets/ \
 
 libs-y		:= \
+		android/ \
 		archival/ \
 		archival/libarchive/ \
 		console-tools/ \
@@ -483,6 +478,7 @@ libs-y		:= \
 		init/ \
 		libbb/ \
 		libpwdgrp/ \
+		libworkaround/ \
 		loginutils/ \
 		mailutils/ \
 		miscutils/ \

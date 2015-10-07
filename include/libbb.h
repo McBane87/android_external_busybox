@@ -1985,4 +1985,8 @@ static ALWAYS_INLINE unsigned char bb_ascii_tolower(unsigned char a)
 
 POP_SAVED_FUNCTION_VISIBILITY
 
+#ifndef CONFIG_DEFAULT_MODULES_DIR
+#define CONFIG_DEFAULT_MODULES_DIR "/system/lib/modules"
+#endif
+
 #endif
