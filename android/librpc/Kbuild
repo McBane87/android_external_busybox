@@ -1,0 +1,52 @@
+# DO NOT EDIT. This file is generated from Kbuild.src
+# Makefile for busybox
+#
+# Copyright (C) 1999-2005 by Erik Andersen <andersen@codepoet.org>
+#
+# Licensed under GPLv2, see file LICENSE in this source tree.
+
+lib-y:=
+
+lib-y += pm_getmaps.o
+lib-y += rpc_thread.o
+lib-y += clnt_udp.o
+lib-y += clnt_perror.o
+lib-y += clnt_simple.o
+lib-y += auth_unix.o
+lib-y += xdr_stdio.o
+lib-y += pmap_prot.o
+lib-y += xdr_rec.o
+lib-y += svc_authux.o
+lib-y += pmap_clnt.o
+lib-y += xdr_reference.o
+lib-y += rpc_prot.o
+lib-y += rpc_dtablesize.o
+lib-y += bindresvport.o
+lib-y += rpc_cmsg.o
+lib-y += svc.o
+lib-y += pm_getport.o
+lib-y += svc_udp.o
+lib-y += rpc_commondata.o
+lib-y += xdr.o
+lib-y += svc_run.o
+lib-y += auth_none.o
+lib-y += svc_tcp.o
+lib-y += xdr_float.o
+lib-y += clnt_raw.o
+lib-y += authunix_prot.o
+lib-y += pmap_prot2.o
+lib-y += clnt_tcp.o
+lib-y += xdr_intXX_t.o
+lib-y += pmap_rmt.o
+lib-y += clnt_unix.o
+lib-y += xdr_mem.o
+lib-y += getrpcent.o
+lib-y += get_myaddress.o
+lib-y += svc_simple.o
+lib-y += svc_unix.o
+lib-y += getrpcport.o
+lib-y += create_xid.o
+lib-y += svc_auth.o
+lib-y += clnt_generic.o
+lib-y += xdr_array.o
+lib-y += svc_raw.o
