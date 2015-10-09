@@ -466,6 +466,8 @@ core-y		:= \
 
 libs-y		:= \
 		android/ \
+		android/libc/ \
+		android/regex/ \
 		archival/ \
 		archival/libarchive/ \
 		console-tools/ \
@@ -478,7 +480,6 @@ libs-y		:= \
 		init/ \
 		libbb/ \
 		libpwdgrp/ \
-		libworkaround/ \
 		loginutils/ \
 		mailutils/ \
 		miscutils/ \

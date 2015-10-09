@@ -5,12 +5,6 @@
 #
 # Licensed under GPLv2, see file LICENSE in this source tree.
 
-libs-y                          += libc/
-libs-y                          += librpc/
-libs-y                          += regex/
-libs-y                          += selinux/
-
-
 lib-y:=
 
 lib-y  += android.o
