@@ -341,7 +341,6 @@ struct globals {
 	unsigned verbose;
 #endif
 	llist_t *fslist;
-	int user_fstype;
 	char getmntent_buf[1];
 } FIX_ALIASING;
 enum { GETMNTENT_BUFSIZE = COMMON_BUFSIZE - offsetof(struct globals, getmntent_buf) };
@@ -353,7 +352,6 @@ enum { GETMNTENT_BUFSIZE = COMMON_BUFSIZE - offsetof(struct globals, getmntent_b
 #define verbose           0
 #endif
 #define fslist            (G.fslist           )
-#define user_fstype       (G.user_fstype      )
 #define getmntent_buf     (G.getmntent_buf    )
 #define INIT_G() do { } while (0)
 
@@ -625,7 +623,7 @@ static int mount_it_now(struct mntent *mp, unsigned long vfsflags, char *filtero
 	// Abort entirely if permission denied.
 
 	if (rc && errno == EPERM)
-		bb_error_msg_and_die("%s", bb_msg_perm_denied_are_you_root);
+		bb_error_msg_and_die(bb_msg_perm_denied_are_you_root);
 
 	// If the mount was successful, and we're maintaining an old-style
 	// mtab file by hand, add the new entry to it now.
@@ -921,7 +919,7 @@ static char *nfs_strerror(int status)
 {
 	int i;
 
-	for (i = 0; i < (int) ARRAY_SIZE(nfs_err_stat); i++) {
+	for (i = 0; i < ARRAY_SIZE(nfs_err_stat); i++) {
 		if (nfs_err_stat[i] == status)
 			return strerror(nfs_err_errnum[i]);
 	}
@@ -1778,7 +1776,6 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 	int rc = -1;
 	unsigned long vfsflags;
 	char *loopFile = NULL, *filteropts = NULL;
-	char *detected_fstype = NULL;
 	llist_t *fl = NULL;
 	struct stat st;
 
@@ -1786,19 +1783,9 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 
 	vfsflags = parse_mount_options(mp->mnt_opts, &filteropts);
 
-	if (user_fstype) {
-		// Treat fstype "auto" as unspecified
-		if (mp->mnt_type && !strcmp(mp->mnt_type, "auto"))
-			mp->mnt_type = NULL;
-	} else if (mp->mnt_type) {
-		// If user didn't specify an fstype and blkid disagrees or the
-		// fstype is "auto", trust blkid's determination of the fstype.
-		detected_fstype = get_fstype_from_devname(mp->mnt_fsname);
-
-		if (!strcmp(mp->mnt_type, "auto") ||
-		    (detected_fstype && strcmp(detected_fstype, mp->mnt_type)))
-			mp->mnt_type = detected_fstype;
-	}
+	// Treat fstype "auto" as unspecified
+	if (mp->mnt_type && strcmp(mp->mnt_type, "auto") == 0)
+		mp->mnt_type = NULL;
 
 	// Might this be a virtual filesystem?
 	if (ENABLE_FEATURE_MOUNT_HELPERS && strchr(mp->mnt_fsname, '#')) {
@@ -1915,7 +1902,7 @@ static int singlemount(struct mntent *mp, int ignore_busy)
 			mp->mnt_fsname = NULL; // will receive malloced loop dev name
 			if (set_loop(&mp->mnt_fsname, loopFile, 0, /*ro:*/ (vfsflags & MS_RDONLY)) < 0) {
 				if (errno == EPERM || errno == EACCES)
-					bb_error_msg("%s", bb_msg_perm_denied_are_you_root);
+					bb_error_msg(bb_msg_perm_denied_are_you_root);
 				else
 					bb_perror_msg("can't setup loop device");
 				return errno;
@@ -2075,8 +2062,6 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 	opt_complementary = "?2o::" IF_FEATURE_MOUNT_VERBOSE("vv");
 	opt = getopt32(argv, OPTION_STR, &lst_o, &fstype, &O_optmatch
 			IF_FEATURE_MOUNT_VERBOSE(, &verbose));
-
-	if (opt & OPT_t) user_fstype = 1;
 	while (lst_o) append_mount_options(&cmdopts, llist_pop(&lst_o)); // -o
 	if (opt & OPT_r) append_mount_options(&cmdopts, "ro"); // -r
 	if (opt & OPT_w) append_mount_options(&cmdopts, "rw"); // -w
@@ -2113,7 +2098,7 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 		// argument when we get it.
 		if (argv[1]) {
 			if (nonroot)
-				bb_error_msg_and_die("%s", bb_msg_you_must_be_root);
+				bb_error_msg_and_die(bb_msg_you_must_be_root);
 			mtpair->mnt_fsname = argv[0];
 			mtpair->mnt_dir = argv[1];
 			mtpair->mnt_type = fstype;
@@ -2130,7 +2115,7 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 
 	cmdopt_flags = parse_mount_options(cmdopts, NULL);
 	if (nonroot && (cmdopt_flags & ~MS_SILENT)) // Non-root users cannot specify flags
-		bb_error_msg_and_die("%s", bb_msg_you_must_be_root);
+		bb_error_msg_and_die(bb_msg_you_must_be_root);
 
 	// If we have a shared subtree flag, don't worry about fstab or mtab.
 	if (ENABLE_FEATURE_MOUNT_FLAGS
@@ -2193,7 +2178,7 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 			// No, mount -a won't mount anything,
 			// even user mounts, for mere humans
 			if (nonroot)
-				bb_error_msg_and_die("%s", bb_msg_you_must_be_root);
+				bb_error_msg_and_die(bb_msg_you_must_be_root);
 
 			// Does type match? (NULL matches always)
 			if (!match_fstype(mtcur, fstype))
@@ -2273,7 +2258,7 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 			// fstab must have "users" or "user"
 			l = parse_mount_options(mtcur->mnt_opts, NULL);
 			if (!(l & MOUNT_USERS))
-				bb_error_msg_and_die("%s", bb_msg_you_must_be_root);
+				bb_error_msg_and_die(bb_msg_you_must_be_root);
 		}
 
 		//util-linux-2.12 does not do this check.
@@ -2290,8 +2275,6 @@ int mount_main(int argc UNUSED_PARAM, char **argv)
 			mtcur->mnt_opts = xstrdup(mtcur->mnt_opts);
 			append_mount_options(&(mtcur->mnt_opts), cmdopts);
 			resolve_mount_spec(&mtpair->mnt_fsname);
-			if (user_fstype)
-				mtcur->mnt_type = fstype;
 			rc = singlemount(mtcur, /*ignore_busy:*/ 0);
 			if (ENABLE_FEATURE_CLEAN_UP)
 				free(mtcur->mnt_opts);
