@@ -7,8 +7,6 @@
 
 lib-y:=
 
-mktemp.c  pty.c  __set_errno.c
-
 lib-y  += mktemp.o
 lib-y  += pty.o
 lib-y  += __set_errno.o
