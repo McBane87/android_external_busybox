@@ -25,7 +25,11 @@
 //usage:       "Name:       debian\n"
 //usage:       "Address:    127.0.0.1\n"
 
+#ifdef KK
+#include <resolv_kk.h> 
+#else
 #include <resolv.h>
+#endif
 #include "libbb.h"
 
 #ifdef ANDROID
